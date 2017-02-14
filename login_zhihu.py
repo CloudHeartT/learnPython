@@ -31,3 +31,10 @@ def isLogin():
         print("登录失败！")
         return False
 
+#登陆成功后获取其中的_xsrf
+def get_xsrf():
+    url='http://www.zhihu.com'
+    r=session.get(url,headers=headers,allow_redirects=False)
+    txt=r.text
+    result=re.findall(r'<input type=\"hidden\" name=\"_xsrf\" value=\"(\w+)\"/>',txt)[0]
+    return result
