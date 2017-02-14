@@ -48,3 +48,4 @@ def getCaptcha():
     f=open("photo.jpg",'wb')
     f.write(image.content)
     f.close()
+	#测试本地修改是否同步到远程库
