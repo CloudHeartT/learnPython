@@ -38,3 +38,13 @@ def get_xsrf():
     txt=r.text
     result=re.findall(r'<input type=\"hidden\" name=\"_xsrf\" value=\"(\w+)\"/>',txt)[0]
     return result
+
+def getCaptcha():
+    #r=1471341285051
+    r=(time.time()*1000)
+    url='http://www.zhihu.com/captcha.gif?r='+str(r)+'&type=login'
+
+    image=session.get(url,headers=headers)
+    f=open("photo.jpg",'wb')
+    f.write(image.content)
+    f.close()
