@@ -39,13 +39,48 @@ def get_xsrf():
     result=re.findall(r'<input type=\"hidden\" name=\"_xsrf\" value=\"(\w+)\"/>',txt)[0]
     return result
 
-def getCaptcha():
-    #r=1471341285051
-    r=(time.time()*1000)
-    url='http://www.zhihu.com/captcha.gif?r='+str(r)+'&type=login'
-
-    image=session.get(url,headers=headers)
-    f=open("photo.jpg",'wb')
-    f.write(image.content)
+    #登录时获取验证码
+def get_Captcha():
+    #r = 1487059817671
+    r= time.time()*1000
+    url = 'https://www.zhihu.com/captcha.gif?r='+str(r)+'&type=login'
+    #知乎现在的验证码有两种形式，一种是普通的填写四个字母，还有一种是点击倒立的汉字
+        #第二种需要在type后追加参数 如https://www.zhihu.com/captcha.gif?r="+str(r)+"&type=login&lang=cn
+    image = session.get(url,headers = Headers)
+    f = open("photo.jpg",'wb')
+    f.write(f.content)
     f.close()
-	#测试本地修改是否同步到远程库
+
+def Login():
+    #取到xsrf
+    xsrf = get_xsrf()
+    url = "https://www.zhihu.com/login/email"
+    data = {
+        'xsrf' :xsrf,
+        'email' : '465731912@qq.com',
+        'password' : 'qqz123123',
+        'remember_me':'true'
+    }
+    try:
+        login_content = session.post(url, data, headers=Headers)
+        text = login_content.text
+        status_code = login_content.status_code
+        print("登录的状态码为："+ status_code)
+        #判断状态码
+        if status_code != requests.codes.ok:
+            print("自动登录失败，需要输入验证码")
+            get_Captcha()
+            code = input("请输入看到的验证码内容")
+            data['captcha'] = code
+            login_content = session.post(url,data,headers = Headers)
+            status_code = login_content.status_code
+            if status_code == requests.code.ok:
+                print("登陆成功（已输验证码）")
+                session.cookies.save()
+        else:
+
+            print("登录成功！")
+            session.cookies.save()
+    except:
+        print("Error in Login")
+        return False
